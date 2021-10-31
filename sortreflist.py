@@ -42,6 +42,22 @@ def _sorted_reflist_to_txt(sorted_reflist: list, txt_path: str):
             tf.write(f'{i+1}) {ref}\n')
 
 
+def _print_discrepancies(main_list: list, ref_list: list):
+    # check if the fancy library is present on the system
+    try:
+        from rich import print, pretty
+        pretty.install()
+    except ModuleNotFoundError as e:
+        pass
+    set_main = set(main_list)
+    set_refs = set(ref_list)
+    # Maybe add emojis or better text colour/font!
+    if len(set_main - set_refs) > 0:
+        print(f"These references in the main text are not in the reflist: {set_main - set_refs}")
+    if len(set_refs - set_main) > 0:
+        print(f"These references in the reflist but not in the main text: {set_refs - set_main}")
+
+
 
 def main_process(file_path:str, split_word: str, outfile_path: str):
     file_content: str = _load_file(file_path)
@@ -52,7 +68,7 @@ def main_process(file_path:str, split_word: str, outfile_path: str):
     
     refs_refs: list = _create_sorted_reflist(content=refs_text)
     logging.debug(refs_refs)
-    # TODO check for disc repancies!
+    _print_discrepancies(main_list=main_refs, ref_list=refs_refs)
     # TODO, quizás buscar el APA de cada referencia en la parte de
     # texto de las referencias
     _sorted_reflist_to_txt(sorted_reflist=main_refs, txt_path=outfile_path)
